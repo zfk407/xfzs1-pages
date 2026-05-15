@@ -7,10 +7,184 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="format-detection" content="telephone=no, email=no" />
     <title>先锋智算·彩票概率分析系统</title>
-  <script type="module"  src="./static/index-D_ay6dkn.js"></script>
   <link rel="stylesheet"  href="./static/index-C9l-7EG8.css">
+  <style>
+    #password-gate {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1040 50%, #0d1538 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    #password-gate .bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.08;
+      background: radial-gradient(circle, #6c5ce7, transparent);
+    }
+    #password-gate .bg-circle.c1 { width: 300px; height: 300px; top: -80px; right: -60px; }
+    #password-gate .bg-circle.c2 { width: 200px; height: 200px; bottom: 10%; left: -50px; }
+    #password-gate .bg-circle.c3 { width: 150px; height: 150px; top: 40%; right: 10%; }
+    #password-gate .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 40px 32px;
+      width: 340px;
+      max-width: 90vw;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    #password-gate .logo-icon { font-size: 48px; display: block; margin-bottom: 8px; }
+    #password-gate .title { font-size: 22px; font-weight: 700; color: #fff; display: block; }
+    #password-gate .subtitle { font-size: 13px; color: rgba(255,255,255,0.5); display: block; margin-top: 4px; }
+    #password-gate .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 24px 0; }
+    #password-gate .label { font-size: 14px; color: rgba(255,255,255,0.7); display: block; margin-bottom: 12px; }
+    #password-gate .input-wrapper {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 2px;
+      transition: border-color 0.3s;
+    }
+    #password-gate .input-wrapper:focus-within {
+      border-color: rgba(108,92,231,0.6);
+      box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+    }
+    #password-gate .pwd-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 4px;
+      box-sizing: border-box;
+    }
+    #password-gate .pwd-input::placeholder { color: rgba(255,255,255,0.3); }
+    #password-gate .error-msg { color: #ff6b6b; font-size: 13px; margin-top: 10px; min-height: 20px; }
+    #password-gate .submit-btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 20px;
+      background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    #password-gate .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(108,92,231,0.4); }
+    #password-gate .submit-btn:active { transform: scale(0.98); }
+    #password-gate .submit-btn.loading { opacity: 0.7; pointer-events: none; }
+    #password-gate .footer-text { color: rgba(255,255,255,0.3); font-size: 12px; margin-top: 24px; }
+    #app { display: none; }
+    body.auth-ok #password-gate { display: none; }
+    body.auth-ok #app { display: block; }
+  </style>
 </head>
 <body>
-    <div id="app"></div>
+  <div id="password-gate">
+    <div class="bg-circle c1"></div>
+    <div class="bg-circle c2"></div>
+    <div class="bg-circle c3"></div>
+    <div class="card">
+      <span class="logo-icon">🎯</span>
+      <span class="title">先锋智算</span>
+      <span class="subtitle">彩票概率分析系统</span>
+      <div class="divider"></div>
+      <span class="label">请输入访问密码</span>
+      <div class="input-wrapper">
+        <input class="pwd-input" type="password" id="pwd-input" placeholder="请输入密码" autocomplete="off" />
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+      <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">进入系统</button>
+      <div class="footer-text">受保护的系统 · 仅限授权访问</div>
+    </div>
+  </div>
+  <div id="app"></div>
+
+  <script>
+    var STORAGE_KEY = '__xfzs_auth__';
+    var VALID_HASH = '9be3e427e098a0c15a2226cfea929653';
+
+    function simpleHash(str) {
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+        var char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+      }
+      var u = (hash >>> 0);
+      var h = u.toString(16);
+      while (h.length < 8) h = '0' + h;
+      var h2 = ((u * 31 + str.length) >>> 0).toString(16);
+      while (h2.length < 8) h2 = '0' + h2;
+      var h3 = ((u * 17 + str.length * 7) >>> 0).toString(16);
+      while (h3.length < 8) h3 = '0' + h3;
+      var h4 = ((u * 13 + str.length * 11) >>> 0).toString(16);
+      while (h4.length < 8) h4 = '0' + h4;
+      return h + h2 + h3 + h4;
+    }
+
+    function checkAuth() {
+      try {
+        var stored = localStorage.getItem(STORAGE_KEY);
+        return stored === VALID_HASH;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    function handleSubmit() {
+      var input = document.getElementById('pwd-input');
+      var errorEl = document.getElementById('error-msg');
+      var btn = document.getElementById('submit-btn');
+      var pwd = input.value.trim();
+
+      if (!pwd) {
+        errorEl.textContent = '请输入访问密码';
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.textContent = '验证中...';
+
+      setTimeout(function() {
+        var hash = simpleHash(pwd);
+        if (hash === VALID_HASH) {
+          try {
+            localStorage.setItem(STORAGE_KEY, hash);
+          } catch(e) {}
+          document.body.classList.add('auth-ok');
+        } else {
+          errorEl.textContent = '密码错误，请重试';
+          input.value = '';
+          btn.classList.remove('loading');
+          btn.textContent = '进入系统';
+        }
+      }, 300);
+    }
+
+    document.getElementById('pwd-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleSubmit();
+    });
+
+    if (checkAuth()) {
+      document.body.classList.add('auth-ok');
+    }
+  </script>
+
+  <script type="module" src="./static/index-D_ay6dkn.js"></script>
 </body>
 </html>
