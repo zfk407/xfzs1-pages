@@ -6,8 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="format-detection" content="telephone=no, email=no" />
-    <title>先锋智算·超级概率分析系统</title>
-  <script type="module"  src="./static/index-D39zHE_k.js"></script>
+    <title>先锋智算·彩票概率分析系统</title>
+  <script type="module"  src="./static/index-DXm76-nA.js"></script>
   <link rel="stylesheet"  href="./static/index-C9l-7EG8.css">
 <style>
 #password-gate {
@@ -99,7 +99,7 @@ body.auth-ok #password-gate {
 <div id="password-gate">
   <div class="gate-box">
     <div class="gate-title">先锋智算</div>
-    <div class="gate-subtitle">超级概率分析系统 · 请输入访问密码</div>
+    <div class="gate-subtitle">彩票概率分析系统 · 请输入访问密码</div>
     <input type="password" class="gate-input" id="gate-password" placeholder="请输入密码" autocomplete="off" />
     <button class="gate-btn" id="gate-submit">验证进入</button>
     <div class="gate-error" id="gate-error"></div>
@@ -110,7 +110,6 @@ body.auth-ok #password-gate {
 
 <script>
 (function() {
-  var STORAGE_KEY = '__xfzs_auth__';
   var VALID_HASH = '9be3e427e098a0c15a2226cfea929653';
 
   function simpleHash(str) {
@@ -131,24 +130,6 @@ body.auth-ok #password-gate {
     return h + h2 + h3 + h4;
   }
 
-  function checkAuth() {
-    try {
-      return localStorage.getItem(STORAGE_KEY) === VALID_HASH;
-    } catch(e) {
-      return false;
-    }
-  }
-
-  function setAuth() {
-    try {
-      localStorage.setItem(STORAGE_KEY, VALID_HASH);
-    } catch(e) {}
-  }
-
-  if (checkAuth()) {
-    document.body.className = 'auth-ok';
-  }
-
   document.getElementById('gate-submit').addEventListener('click', function() {
     var input = document.getElementById('gate-password');
     var error = document.getElementById('gate-error');
@@ -165,7 +146,6 @@ body.auth-ok #password-gate {
 
     var hash = simpleHash(pwd);
     if (hash === VALID_HASH) {
-      setAuth();
       document.body.className = 'auth-ok';
     } else {
       error.textContent = '密码错误，请重试';
